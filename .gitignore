@@ -1,0 +1,10 @@
+# Node
+node_modules/
+# Angular build outputs
+frontend/dist/
+frontend/.angular/
+# Logs
+npm-debug.log*
+# Env
+.env
+backend/dist/
