@@ -1,0 +1,14 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "name": { "type": "string", "description": "Name of component" },
+    "intent": { "type": "string", "description": "Path to intent YAML" },
+    "recipe": { "type": "string", "description": "Path to recipe JSON" },
+    "featureDir": { "type": "string", "description": "Directory to output components", "default": "apps/studio/src/app/generated" }
+  },
+  "anyOf": [
+    { "required": ["intent"] },
+    { "required": ["recipe"] }
+  ]
+}

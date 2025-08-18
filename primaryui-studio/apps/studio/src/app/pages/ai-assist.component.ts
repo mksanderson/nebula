@@ -16,12 +16,28 @@ const screenSpecSchema = {
   }
 };
 
+// Intent schema for validation
+const intentSchema = {
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["name", "purpose", "props_schema"],
+  "properties": {
+    "name": { "type": "string" },
+    "purpose": { "type": "string" },
+    "props_schema": { "type": "object" }
+  }
+};
+
 @Component({
   selector: 'pui-ai-assist',
   standalone: true,
   template: `
   <form [formGroup]="form" (ngSubmit)="submit()">
-    <textarea formControlName="prompt" placeholder="Describe your screen"></textarea>
+    <textarea formControlName="prompt" placeholder="Describe your asset"></textarea>
+    <select formControlName="target">
+      <option value="ScreenSpec">ScreenSpec</option>
+      <option value="Intent">Intent</option>
+    </select>
     <select formControlName="model">
       <option value="anthropic/claude-3.5-sonnet">claude-3.5-sonnet</option>
       <option value="openai/gpt-4o-mini">gpt-4o-mini</option>
@@ -37,6 +53,7 @@ const screenSpecSchema = {
 export class AiAssistComponent {
   form = this.fb.group({
     prompt: ['', Validators.required],
+    target: ['ScreenSpec'],
     model: ['anthropic/claude-3.5-sonnet']
   });
   result: any = null;
@@ -47,11 +64,12 @@ export class AiAssistComponent {
 
   submit() {
     this.errors = [];
-    const { prompt, model } = this.form.value as any;
-    this.ai.chat(model, [{ role: 'user', content: prompt }], screenSpecSchema)
+    const { prompt, model, target } = this.form.value as any;
+    const schema = target === 'Intent' ? intentSchema : screenSpecSchema;
+    this.ai.chat(model, [{ role: 'user', content: prompt }], schema)
       .subscribe({
         next: (json) => {
-          const validate = this.ajv.compile(screenSpecSchema);
+          const validate = this.ajv.compile(schema);
           if (validate(json)) {
             this.result = json;
           } else {
